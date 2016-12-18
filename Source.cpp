@@ -54,10 +54,10 @@ void main(){
 			break;
 		case 'y':
 			cout << "Excellent. Let's begin.\n";
-			ShipGen(FRIGATE, "frigate" grid[ARRAYMAX][ARRAYMAX]);
+			ShipGen(FRIGATE, "frigate", grid);
 			cout << "Input the number of shots you want to use:";
 			cin >> shots;
-			ShotsFired(shots, grid[ARRAYMAX][ARRAYMAX]);
+			ShotsFired(shots, grid);
 			break;
 		default:
 			cout << "Invalid input. Try again.\n";
@@ -127,7 +127,7 @@ void ShipGen(const int SHIP, string shipClass, Status grid[ARRAYMAX][ARRAYMAX]){
 	} while(success = false);
 }
 
-void ShotsFired(int s, Status grid[ARRAYMAX][ARRAYMAX){
+void ShotsFired(int s, Status grid[ARRAYMAX][ARRAYMAX]){
 
 	char rowInput; // Letter input for row
 	int columnInput; // Column input
@@ -147,9 +147,7 @@ void ShotsFired(int s, Status grid[ARRAYMAX][ARRAYMAX){
 			column = columnInput - 1;
 		}
 		CheckSquare(row, column, grid);
-		GridPrint(grid[ARRAYMAX][ARRAYMAX]);
-		if()
-
+		GridPrint(grid);
 	}
 }
 
@@ -163,8 +161,6 @@ void CheckSquare(int& row, int& column, Status grid[ARRAYMAX][ARRAYMAX]){
 		grid[row][column].display = 'o';
 		grid[row][column].hit = true;
 		break;
-	default:
-		cout << "Error: Switch function did not result in a boolean.\n\n";
 	}
 }
 
