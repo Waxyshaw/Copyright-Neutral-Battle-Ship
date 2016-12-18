@@ -29,11 +29,12 @@ struct Status{
 	char display = '~'; // Used for display symbol.
 };
 
-void ShotsFired(); // Function used to loop through program until shots are depleted.
-void ShipGen(); // Function used to generate the ships in-game.
-void CheckSquare(); // Checks and changes values on chosen square
-void GridPrint(); // Function used to print the Battle Ship grid.
-void Insanity(); // Look up the definition of insanity.
+void ShipGen(const int, string, Status grid[ARRAYMAX][ARRAYMAX]); // Function used to generate the ships in-game.
+void ShotsFired(int, Status grid[ARRAYMAX][ARRAYMAX]); // Function used to loop through program until shots are depleted.
+void CheckSquare(int, int, Status grid[ARRAYMAX][ARRAYMAX]); // Checks and changes values on chosen square
+void GridPrint(Status grid[ARRAYMAX][ARRAYMAX]); // Function used to print the Battle Ship grid.
+void LetterPrint(int&, int&); // Consolidates the column of letters delineating each row.
+void Insanity(int); // Look up the definition of insanity.
 
 void main(){
 
@@ -44,7 +45,8 @@ void main(){
 	int shots; // Used for the ShotsFired function.
 
 	// Greetings, human.
-	cout << "Hello and welcome to Wacyshaw's copyright-neutral Battle Ship!\nWould you like to play?\n\nType \"y\" to begin. Type \"n\" to quit.\n";
+	cout << "Hello and welcome to Wacyshaw's copyright-neutral Battle Ship!";
+	cout << "\nWould you like to play?\n\nType \"y\" to begin. Type \"n\" to quit.\n";
 	
 	do{
 		cin >> play;
@@ -54,7 +56,15 @@ void main(){
 			break;
 		case 'y':
 			cout << "Excellent. Let's begin.\n";
-			ShipGen(FRIGATE, "frigate", grid);
+
+			// Generate ships.
+			ShipGen(FRIGATE, "Frigate", grid);
+			ShipGen(TENDER, "Tender", grid);
+			ShipGen(DESTROYER, "Destroyer", grid);
+			ShipGen(CRUISER, "Cruiser", grid);
+			ShipGen(CARRIER, "Carrier", grid);
+
+			// Input the number of shots you want to use
 			cout << "Input the number of shots you want to use:";
 			cin >> shots;
 			ShotsFired(shots, grid);
@@ -74,13 +84,14 @@ void main(){
 void ShipGen(const int SHIP, string shipClass, Status grid[ARRAYMAX][ARRAYMAX]){
 
 	bool success = false; // Used to reset ship generation
-	srand(100);
 
-	do{ // while(success = false) so we don't get shipos outside of the borders.
-		// Coordinates where the ship is initially generated 
-		int x = rand() % 15;
-		int y = rand() % 15;
-		int direction = rand() % 4;
+	// Coordinates where the ship is initially generated 
+	srand(100);
+	int x = rand() % 15;
+	int y = rand() % 15;
+	int direction = rand() % 4;
+
+	do{ // while(!success) so we don't get ships outside of the borders.
 
 		grid[x][y].shipClass = shipClass; // Labelling the square's ship as a specific ship class.
 		grid[x][y].ship = true; // Labelling the square as containing a ship
@@ -90,41 +101,37 @@ void ShipGen(const int SHIP, string shipClass, Status grid[ARRAYMAX][ARRAYMAX]){
 			switch(direction){
 			case 0:
 				x++;
-				if(x > 15 || (grid[x][y].ship = true)) // Used to make sure ships don't extend past the borders
-					break;
-				grid[x][y].shipClass = shipClass;
-				grid[x][y].ship = true;
-				success = true;
+				if((x < 15) && (x >= 0) && (grid[x][y].ship == false)) break; // Used to make sure ships don't extend past the borders
+					grid[x][y].shipClass = shipClass;
+					grid[x][y].ship = true;
+					success = true;
 				break;
 			case 1:
-				if(x > 15 || (grid[x][y].ship = true))
-					break;
 				x--;
-				grid[x][y].shipClass = shipClass;
-				grid[x][y].ship = true;
-				success = true;
+				if((x < 15) && (x >= 0) && (grid[x][y].ship == false)) break;
+					grid[x][y].shipClass = shipClass;
+					grid[x][y].ship = true;
+					success = true;
 				break;
 			case 2:
-				if(y > 15 || (grid[x][y].ship = true))
-					break;
-				y++;
-				grid[x][y].shipClass = shipClass;
-				grid[x][y].ship = true;
-				success = true;
+				if((y < 15) && (y >= 0) && (grid[x][y].ship == false)) break;
+					y++;
+					grid[x][y].shipClass = shipClass;
+					grid[x][y].ship = true;
+					success = true;
 				break;
 			case 3:
-				if(y > 15 || (grid[x][y].ship = true))
-					break;
-				y--;
-				grid[x][y].shipClass = shipClass;
-				grid[x][y].ship = true;
-				success = true;
+				if((y < 15) && (y >= 0) && (grid[x][y].ship == false)) break;
+					y--;
+					grid[x][y].shipClass = shipClass;
+					grid[x][y].ship = true;
+					success = true;
 				break;
 			default:
 				cout << "Error: var \"direction\" invalid.\n\n";
 			}
 		}
-	} while(success = false);
+	} while(!success);
 }
 
 void ShotsFired(int s, Status grid[ARRAYMAX][ARRAYMAX]){
@@ -135,29 +142,34 @@ void ShotsFired(int s, Status grid[ARRAYMAX][ARRAYMAX]){
 	int column; // Converts columnInput to correct array position
 
 	for(int n = 0; n < s; n++){
-		cout << "Where do you want to fire? Enter a letter between \"A\" and \"O\" followed by a number between 1 and 15 (e.g. A1): \n";
+		cout << "Where do you want to fire?" 
+			<< "Enter a letter between \"A\" and \"O\" followed by a number between 1 and 15 (e.g. A1): \n";
 		cin >> rowInput >> columnInput;
 		row = int(tolower(rowInput)) - 97; // Converts the letter to an integer
 		column = columnInput - 1;
+
+		// For failing to choose a new square
 		for(int counter = 0; grid[row][column].hit == true; counter++){
 			Insanity(counter);
-			cout << "Where do you want to fire? Enter a letter between \"A\" and \"O\" followed by a number between 1 and 15 (e.g. A1): \n";
+			cout << "Where do you want to fire?" 
+				<< "Enter a letter between \"A\" and \"O\" followed by a number between 1 and 15 (e.g. A1): \n";
 			cin >> rowInput >> columnInput;
 			row = int(tolower(rowInput)) - 97;
 			column = columnInput - 1;
 		}
+
 		CheckSquare(row, column, grid);
 		GridPrint(grid);
 	}
 }
 
-void CheckSquare(int& row, int& column, Status grid[ARRAYMAX][ARRAYMAX]){
+void CheckSquare(int row, int column, Status grid[ARRAYMAX][ARRAYMAX]){
 	switch(grid[row][column].ship){
-	case true:
+	case true: // Hit
 		grid[row][column].display = 'x';
 		grid[row][column].hit = true;
 		break;
-	case false:
+	case false: // Miss
 		grid[row][column].display = 'o';
 		grid[row][column].hit = true;
 		break;
@@ -165,13 +177,99 @@ void CheckSquare(int& row, int& column, Status grid[ARRAYMAX][ARRAYMAX]){
 }
 
 void GridPrint(Status grid[ARRAYMAX][ARRAYMAX]){
-	for(int m = 0; m < ARRAYMAX; m++){
-		for (int n = 0; n < ARRAYMAX; n++){
-			cout << "   " << grid[m][n].display;
-			if((m % 15) == 0){
+
+	cout << "     1    2    3    4    5    6    7    8    9    10    11    12    13    14    15" << endl;
+	cout << "A";
+
+	for(int m = 0; m <= ARRAYMAX; m++){
+		for(int n = 0; n <= ARRAYMAX; n++){
+			cout << "    ";
+			if((n >= 10) && (n <= ARRAYMAX)) cout << " "; // Formatting for double-digit numbers
+			cout << grid[m][n].display;
+			if(n == ARRAYMAX){
 				cout << "\n";
+				LetterPrint(m, n);
 			}
 		}
+	}
+}
+
+void LetterPrint(int& m, int& n){
+	switch(m){
+	case 0:
+		cout << "B";
+		n = 0;
+		m++;
+		break;
+	case 1:
+		cout << "C";
+		n = 0;
+		m++;
+		break;
+	case 2:
+		cout << "D";
+		n = 0;
+		m++;
+		break;
+	case 3:
+		cout << "E";
+		n = 0;
+		m++;
+		break;
+	case 4:
+		cout << "F";
+		n = 0;
+		m++;
+		break;
+	case 5:
+		cout << "G";
+		n = 0;
+		m++;
+		break;
+	case 6:
+		cout << "H";
+		n = 0;
+		m++;
+		break;
+	case 7:
+		cout << "I";
+		n = 0;
+		m++;
+		break;
+	case 8:
+		cout << "J";
+		n = 0;
+		m++;
+		break;
+	case 9:
+		cout << "K";
+		n = 0;
+		m++;
+		break;
+	case 10:
+		cout << "L";
+		n = 0;
+		m++;
+		break;
+	case 11:
+		cout << "M";
+		n = 0;
+		m++;
+		break;
+	case 12:
+		cout << "N";
+		n = 0;
+		m++;
+		break;
+	case 13:
+		cout << "O";
+		n = 0;
+		m++;
+		break;
+	case 14:
+		break;
+	default:
+		cout << "Error with \"LetterPrint\" function.";
 	}
 }
 
